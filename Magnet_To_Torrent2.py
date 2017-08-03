@@ -41,6 +41,10 @@ def magnet2torrent(magnet, output_name=None):
 
     tempdir = tempfile.mkdtemp()
     ses = lt.session()
+    ses.start_dht()
+    ses.start_lsd()
+    ses.start_upnp()
+    ses.start_natpmp()
     params = {
         'save_path': tempdir,
         'storage_mode': lt.storage_mode_t(2),
@@ -51,9 +55,12 @@ def magnet2torrent(magnet, output_name=None):
     handle = lt.add_magnet_uri(ses, magnet, params)
 
     print("Downloading Metadata (this may take a while)")
+    count=0
     while (not handle.has_metadata()):
         try:
             sleep(1)
+            count+=1
+            print("trying %02d"%count)
         except KeyboardInterrupt:
             print("Aborting...")
             ses.pause()
